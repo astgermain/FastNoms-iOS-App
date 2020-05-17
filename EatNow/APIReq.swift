@@ -17,7 +17,7 @@ class APIReq: NSObject {
     
     
     
-    static func req(_ term: String, _ latitude: Double, _ longitude: Double, _ radius: Double, completion: @escaping (_ result: [String: Any]) -> Void) {
+    static func req(_ term: String, _ latitude: Double, _ longitude: Double, _ radius: Double, _ price: String, completion: @escaping (_ result: [String: Any]) -> Void) {
         //Sends authorization header with API Key
         //TODO:
         //Find way to store API Key in Keychain
@@ -43,13 +43,35 @@ class APIReq: NSObject {
        
         let trimmedTerm = term.replacingOccurrences(of: " ", with: "-")
         let parsedRadius = Int(radius) * 1600
-        AF.request("\(apiUrl)businesses/search?term=\(trimmedTerm)&latitude=\(latitude)&longitude=\(longitude)&radius=\(parsedRadius)", headers: headers).validate().responseJSON { closureResponse in
+        var ifPrice = ""
+        if(price != ""){
+            ifPrice = "&price=\(price)"
+        }
+        
+        struct Businesses: Codable {
+            var coordinates: [Coordinates]
+            var name: String
+        }
+        struct Coordinates: Codable {
+            var longitude: Float
+            var latitude: Float
+        }
+        
+        
+        AF.request("\(apiUrl)businesses/search?term=\(trimmedTerm)&latitude=\(latitude)&longitude=\(longitude)&radius=\(parsedRadius)&open_now=true\(ifPrice)", headers: headers).validate().responseJSON { closureResponse in
             response = closureResponse
-            //debugPrint(response)
+            //debugPrint(closureResponse)
             switch response?.result {
-                case .success(let value as [String: Any]):
-                    completion(value)
-
+                case .success(let JSON):
+                    let value = JSON as! NSDictionary
+                    let places = value["businesses"] as! Array<Any>
+                    guard let randomPlace = places.randomElement() else{
+                        print("No results")
+                        return
+                    }
+                    let random = randomPlace as! NSDictionary
+                    let randomName = random.value(forKey: "name")
+                    print(randomName!)
                 case .failure(let error ):
                     print(error)
 
@@ -61,8 +83,8 @@ class APIReq: NSObject {
         
     }
     
-    static func getResult(term:String, latitude:Double, longitude:Double, radius:Double, completionHandler: @escaping (_ result: [String: Any]) -> Void) {
-        req(term, latitude, longitude, radius, completion: completionHandler)
+    static func getResult(term:String, latitude:Double, longitude:Double, radius:Double, price:String, completionHandler: @escaping (_ result: [String: Any]) -> Void) {
+        req(term, latitude, longitude, radius, price, completion: completionHandler)
     }
 }
         

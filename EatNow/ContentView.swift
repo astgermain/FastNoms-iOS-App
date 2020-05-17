@@ -21,6 +21,10 @@ struct ContentView: View {
     @State private var showPopover: Bool = false
     @State private var modalPresented: Bool = false
     @State private var longer: Bool = false
+    @State private var P1 = false
+    @State private var P2 = false
+    @State private var P3 = false
+    @State private var P4 = false
     
     init() {
         locationProvider = LocationProvider()
@@ -46,9 +50,36 @@ struct ContentView: View {
                         TextField("What do you feel like eating?", text: $term)
                             .border(Color.black)
                         Button("Search"){
-                        
+                            var priceString = ""
+                            if(self.P1){
+                                priceString.append("1")
+                            }
+                            if(self.P2){
+                                if(priceString == ""){
+                                    priceString.append("2")
+                                }
+                                else{
+                                    priceString.append(",2")
+                                }
+                            }
+                            if(self.P3){
+                                if(priceString == ""){
+                                    priceString.append("3")
+                                }
+                                else{
+                                    priceString.append(",3")
+                                }
+                            }
+                            if(self.P4){
+                                if(priceString == ""){
+                                    priceString.append("4")
+                                }
+                                else{
+                                    priceString.append(",4")
+                                }
+                            }
                             APIReq.getResult(term: self.term, latitude: (self.locationProvider.location?.coordinate.latitude)!,
-                                             longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius) { result in
+                                             longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius, price: priceString) { result in
                                 print(result.keys)
                                 let JSON = result
                                 if let total = JSON["total"] as? NSNumber {
@@ -81,6 +112,32 @@ struct ContentView: View {
                 }
                 else{
                    Text("Search radius: \(Int(radius))")
+                }
+                HStack{
+                    Button(action: {self.P1.toggle()}) {
+                        Text("$")
+                            .foregroundColor(.white)
+                    }   .padding(.all)
+                        .background(RoundedRectangle(cornerRadius: 5.0)
+                                    .fill(self.P1 ? Color.green : Color.blue))
+                    Button(action: {self.P2.toggle()}) {
+                        Text("$$")
+                            .foregroundColor(.white)
+                    }   .padding(.all)
+                        .background(RoundedRectangle(cornerRadius: 5.0)
+                                    .fill(self.P2 ? Color.green : Color.blue))
+                    Button(action: {self.P3.toggle()}) {
+                        Text("$$$")
+                            .foregroundColor(.white)
+                    }   .padding(.all)
+                        .background(RoundedRectangle(cornerRadius: 5.0)
+                                    .fill(self.P3 ? Color.green : Color.blue))
+                    Button(action: {self.P4.toggle()}) {
+                        Text("$$$$")
+                            .foregroundColor(.white)
+                    }   .padding(.all)
+                        .background(RoundedRectangle(cornerRadius: 5.0)
+                                    .fill(self.P4 ? Color.green : Color.blue))
                 }
                 
                 Slider(value: self.$radius, in: 0...25, step: 1)

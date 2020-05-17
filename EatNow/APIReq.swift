@@ -17,7 +17,7 @@ class APIReq: NSObject {
     
     
     
-    static func req(_ term: String, _ location: String, _ radius: Double, completion: @escaping (_ result: [String: Any]) -> Void) {
+    static func req(_ term: String, _ latitude: Double, _ longitude: Double, _ radius: Double, completion: @escaping (_ result: [String: Any]) -> Void) {
         //Sends authorization header with API Key
         //TODO:
         //Find way to store API Key in Keychain
@@ -41,11 +41,9 @@ class APIReq: NSObject {
         var response: DataResponse<Any, AFError>?
 
        
-        let trimmedLocation = location.replacingOccurrences(of: " ", with: "-")
         let trimmedTerm = term.replacingOccurrences(of: " ", with: "-")
-        let parsedRadius = Int(radius)
-        //debugPrint(parsedRadius)
-        AF.request("\(apiUrl)businesses/search?term=\(trimmedTerm)&location=\(trimmedLocation)&radius=\(parsedRadius)", headers: headers).validate().responseJSON { closureResponse in
+        let parsedRadius = Int(radius) * 1600
+        AF.request("\(apiUrl)businesses/search?term=\(trimmedTerm)&latitude=\(latitude)&longitude=\(longitude)&radius=\(parsedRadius)", headers: headers).validate().responseJSON { closureResponse in
             response = closureResponse
             //debugPrint(response)
             switch response?.result {
@@ -63,8 +61,8 @@ class APIReq: NSObject {
         
     }
     
-    static func getResult(term:String, location:String, radius:Double, completionHandler: @escaping (_ result: [String: Any]) -> Void) {
-        req(term, location, radius, completion: completionHandler)
+    static func getResult(term:String, latitude:Double, longitude:Double, radius:Double, completionHandler: @escaping (_ result: [String: Any]) -> Void) {
+        req(term, latitude, longitude, radius, completion: completionHandler)
     }
 }
         

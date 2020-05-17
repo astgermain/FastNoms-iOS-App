@@ -9,6 +9,7 @@
 import SwiftUI
 import PartialSheet
 
+
 struct ContentView: View {
     var sortType = ["Recommended", "Rating", "Distance", "Most Reviewed"]
     @ObservedObject var locationProvider : LocationProvider
@@ -38,44 +39,42 @@ struct ContentView: View {
                 Text("""
                Some information text! Here about the whole app and what it does.
                """)
-                VStack{
-                Text("latitude \(locationProvider.location?.coordinate.latitude ?? 0)")
-                Text("longitude \(locationProvider.location?.coordinate.longitude ?? 0)")
-                }
+                
                 
                 HStack {
-                    TextField("Search", text: $term)
-                        .border(Color.black)
-                    TextField("Location", text: $location)
-                        .border(Color.black)
-                    Button("Test"){
-                    
-                        APIReq.getResult(term: self.term, location: self.location, radius: self.radius) { result in
-                            print(result.keys)
-                            let JSON = result
-                            if let total = JSON["total"] as? NSNumber {
-                                print(total)
-                            }
-                            if let region = JSON["region"] as? NSDictionary {
-                                print(region)
-                            }
-                            if let businesses = JSON["businesses"] as? NSArray {
-                                print(businesses)
+                    VStack {
+                        TextField("What do you feel like eating?", text: $term)
+                            .border(Color.black)
+                        Button("Search"){
+                        
+                            APIReq.getResult(term: self.term, latitude: (self.locationProvider.location?.coordinate.latitude)!,
+                                             longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius) { result in
+                                print(result.keys)
+                                let JSON = result
+                                if let total = JSON["total"] as? NSNumber {
+                                    print(total)
+                                }
+                                if let region = JSON["region"] as? NSDictionary {
+                                    print(region)
+                                }
+                                if let businesses = JSON["businesses"] as? NSArray {
+                                    print(businesses)
+                                }
+                                
+                                //let coords = JSON["coordinates"] as! NSDictionary
+                                //let latitude = coords["latitude"]!
+                                //let longitude = coords["longitude"]!
+                                //print(coords)
+                                //print(latitude)
+                                //print(longitude)
                             }
                             
-                            //let coords = JSON["coordinates"] as! NSDictionary
-                            //let latitude = coords["latitude"]!
-                            //let longitude = coords["longitude"]!
-                            //print(coords)
-                            //print(latitude)
-                            //print(longitude)
+                            
                         }
-                        
-                        
+                        .accentColor(.white)
+                        .padding()
+                        .background(Color.gray)
                     }
-                    .accentColor(.white)
-                    .padding()
-                    .background(Color.gray)
                 }
                 if((Int(radius)) == 0){
                     Text("Search radius: None")

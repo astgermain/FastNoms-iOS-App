@@ -15,6 +15,7 @@ struct ContentView: View {
     @State private var selectedSort = 0
     @State var term: String = ""
     @State var location: String = ""
+    @State private var radius: Double = 0
     @State private var showPopover: Bool = false
     @State private var modalPresented: Bool = false
     @State private var longer: Bool = false
@@ -55,16 +56,19 @@ struct ContentView: View {
                             //print(longitude)
                         }
                         
+                        
                     }
                     .accentColor(.white)
                     .padding()
                     .background(Color.gray)
                 }
+                Text("Distance away: \(Int(radius))")
+                Slider(value: self.$radius, in: 0...100, step: 1)
                 Spacer()
                 HStack {
+                    
                     Button("Filters") {
                         self.showPopover = true
-                        self.modalPresented = true
                     }
                         
                         

@@ -91,7 +91,8 @@ class APIReq: NSObject {
                     let value = JSON as! NSDictionary
                     let places = value["businesses"] as! Array<Any>
                     guard let randomPlace = places.randomElement() else{
-                        print("No results")
+                        let none: [String : Any]  = [:]
+                        completion(none)
                         return
                     }
                     let random = randomPlace as! NSDictionary

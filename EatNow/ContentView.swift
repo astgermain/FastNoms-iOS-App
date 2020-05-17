@@ -41,6 +41,8 @@ struct ContentView: View {
     @State private var eateryState = ""
     @State private var eateryZip = ""
     
+    let alert1 = Alert(title: Text("There were no results"))
+    
     init() {
         locationProvider = LocationProvider()
         do {try locationProvider.start()}
@@ -56,88 +58,85 @@ struct ContentView: View {
         NavigationView {
             
             VStack {
-                Text("Info here")
+                Text("")
                 HStack {
                     VStack {
-                        TextField("What do you feel like eating?", text: $term)
-                            .border(Color.black)
-                        Button("Search"){
-                            var priceString = ""
-                            if(self.P1){
-                                priceString.append("1")
+                        HStack{
+                            Image(systemName: "magnifyingglass.circle").foregroundColor(.gray)
+                            TextField("What do you feel like eating?", text: $term){
+                                var priceString = ""
+                                if(self.P1){
+                                    priceString.append("1")
+                                }
+                                if(self.P2){
+                                    if(priceString == ""){
+                                        priceString.append("2")
+                                    }
+                                    else{
+                                        priceString.append(",2")
+                                    }
+                                }
+                                if(self.P3){
+                                    if(priceString == ""){
+                                        priceString.append("3")
+                                    }
+                                    else{
+                                        priceString.append(",3")
+                                    }
+                                }
+                                if(self.P4){
+                                    if(priceString == ""){
+                                        priceString.append("4")
+                                    }
+                                    else{
+                                        priceString.append(",4")
+                                    }
+                                }
+                                APIReq.getResult(term: self.term, latitude: (self.locationProvider.location?.coordinate.latitude)!,
+                                                 longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius, price: priceString) { result in
+                                    //print(result.keys)
+                                    let JSON = result
+                                    //print(JSON)
+                                    if let imageUrl = JSON["image_url"]{
+                                        self.eateryImage = imageUrl as! String
+                                    }
+                                    if let businessName = JSON["name"]{
+                                        self.eateryName = businessName as! String
+                                        self.showPopover = true
+                                    }
+                                    else{
+                                        self.searchAlert = true
+                                    }
+                                    if let coordinates = JSON["coordinates"] as? NSDictionary {
+                                        self.eateryLatitude = coordinates["latitude"] as! Double
+                                        self.eateryLongitude = coordinates["longitude"] as! Double
+                                    }
+                                    if let locate = JSON["location"] as? NSDictionary {
+                                        self.eateryAddress1 = locate["address1"] as! String
+                                        self.eateryCity = locate["city"] as! String
+                                        self.eateryState = locate["state"] as! String
+                                        self.eateryZip = locate["zip_code"] as! String
+                                    }
+                                    if let phoneNumber = JSON["phone"]{
+                                        let pn = phoneNumber as! String
+                                        let trimmedNumber = pn.replacingOccurrences(of: "+", with: "")
+                                        let tel = "tel://"
+                                        let formattedString = tel + trimmedNumber
+                                        let url: URL = URL(string: formattedString)!
+                                        self.eateryNumber = url
+                                    }
+                                    if let ypURL = JSON["url"]{
+                                        let yp = ypURL as! String
+                                        let url: URL = URL(string: yp)!
+                                        self.eateryYPURL = url
+                                    }
+                                }
                             }
-                            if(self.P2){
-                                if(priceString == ""){
-                                    priceString.append("2")
-                                }
-                                else{
-                                    priceString.append(",2")
-                                }
-                            }
-                            if(self.P3){
-                                if(priceString == ""){
-                                    priceString.append("3")
-                                }
-                                else{
-                                    priceString.append(",3")
-                                }
-                            }
-                            if(self.P4){
-                                if(priceString == ""){
-                                    priceString.append("4")
-                                }
-                                else{
-                                    priceString.append(",4")
-                                }
-                            }
-                            APIReq.getResult(term: self.term, latitude: (self.locationProvider.location?.coordinate.latitude)!,
-                                             longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius, price: priceString) { result in
-                                //print(result.keys)
-                                let JSON = result
-                                print(JSON)
-                                if let imageUrl = JSON["image_url"]{
-                                    self.eateryImage = imageUrl as! String
-                                }
-                                if let businessName = JSON["name"]{
-                                    self.eateryName = businessName as! String
-                                }
-                                if let coordinates = JSON["coordinates"] as? NSDictionary {
-                                    self.eateryLatitude = coordinates["latitude"] as! Double
-                                    self.eateryLongitude = coordinates["longitude"] as! Double
-                                }
-                                if let locate = JSON["location"] as? NSDictionary {
-                                    self.eateryAddress1 = locate["address1"] as! String
-                                    self.eateryCity = locate["city"] as! String
-                                    self.eateryState = locate["state"] as! String
-                                    self.eateryZip = locate["zip_code"] as! String
-                                }
-                                if let phoneNumber = JSON["phone"]{
-                                    let pn = phoneNumber as! String
-                                    let trimmedNumber = pn.replacingOccurrences(of: "+", with: "")
-                                    let tel = "tel://"
-                                    let formattedString = tel + trimmedNumber
-                                    let url: URL = URL(string: formattedString)!
-                                    self.eateryNumber = url
-                                }
-                                if let ypURL = JSON["url"]{
-                                    let yp = ypURL as! String
-                                    let url: URL = URL(string: yp)!
-                                    self.eateryYPURL = url
-                                }
-                                if(self.eateryName == ""){
-                                    self.searchAlert.toggle()
-                                }
-                                else{
-                                    self.showPopover = true
-                                }
-                            }
+                                
                         }
-                        .alert(isPresented: $searchAlert) {
-                            Alert(title: Text("There were 5 total results"))
-                        }
-                        .accentColor(.white)
-                        .padding()
-                        .background(Color.gray)
+                        .padding(10)
+                        .font(Font.system(size: 15, weight: .medium, design: .serif))
+                        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
                         .popover(isPresented: self.$showPopover, arrowEdge: .bottom) {
                             NavigationView {
                                 VStack{
@@ -174,33 +173,53 @@ struct ContentView: View {
                                 )
                             }
                         }
+                    }.alert(isPresented: self.$searchAlert) {
+                        self.alert1
                     }
                 }
+                
                 HStack{
-                    Button(action: {self.P1.toggle()}) {
-                        Text("$")
-                            .foregroundColor(.white)
-                    }   .padding(.all)
-                        .background(RoundedRectangle(cornerRadius: 5.0)
-                                    .fill(self.P1 ? Color.green : Color.blue))
-                    Button(action: {self.P2.toggle()}) {
-                        Text("$$")
-                            .foregroundColor(.white)
-                    }   .padding(.all)
-                        .background(RoundedRectangle(cornerRadius: 5.0)
-                                    .fill(self.P2 ? Color.green : Color.blue))
-                    Button(action: {self.P3.toggle()}) {
-                        Text("$$$")
-                            .foregroundColor(.white)
-                    }   .padding(.all)
-                        .background(RoundedRectangle(cornerRadius: 5.0)
-                                    .fill(self.P3 ? Color.green : Color.blue))
-                    Button(action: {self.P4.toggle()}) {
-                        Text("$$$$")
-                            .foregroundColor(.white)
-                    }   .padding(.all)
-                        .background(RoundedRectangle(cornerRadius: 5.0)
-                                    .fill(self.P4 ? Color.green : Color.blue))
+                    GeometryReader { geometry in
+                        HStack{
+                        Button(action: {self.P1.toggle()}) {
+                            Text("$")
+                                .foregroundColor(self.P1 ? .white : .black)
+                        }
+                            .accentColor(.black)
+                            .padding(10)
+                            .frame(width: geometry.size.width/4, height: 50)
+                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
+                            .background(RoundedRectangle(cornerRadius: 5.0)
+                            .fill(self.P1 ? Color.blue : Color.white))
+                        Button(action: {self.P2.toggle()}) {
+                            Text("$$")
+                                .foregroundColor(self.P2 ? .white : .black)
+                        }   .accentColor(.black)
+                            .padding(10)
+                            .frame(width: geometry.size.width/4, height: 50)
+                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
+                            .background(RoundedRectangle(cornerRadius: 5.0)
+                            .fill(self.P2 ? Color.blue : Color.white))
+                        Button(action: {self.P3.toggle()}) {
+                            Text("$$$")
+                                .foregroundColor(self.P3 ? .white : .black)
+                        }   .accentColor(.black)
+                            .padding(10)
+                            .frame(width: geometry.size.width/4, height: 50)
+                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
+                            .background(RoundedRectangle(cornerRadius: 5.0)
+                            .fill(self.P3 ? Color.blue : Color.white))
+                        Button(action: {self.P4.toggle()}) {
+                            Text("$$$$")
+                                .foregroundColor(self.P4 ? .white : .black)
+                        }   .accentColor(.black)
+                            .padding(10)
+                            .frame(width: geometry.size.width/4, height: 50)
+                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
+                            .background(RoundedRectangle(cornerRadius: 5.0)
+                            .fill(self.P4 ? Color.blue : Color.white))
+                        }
+                    }
                 }
                 if((Int(radius)) == 0){
                     Text("Search radius: None")

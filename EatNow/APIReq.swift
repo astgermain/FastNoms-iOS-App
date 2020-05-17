@@ -10,12 +10,36 @@ import Alamofire
 import Foundation
 import MapKit
 import CoreLocation
+import Contacts
 
 class APIReq: NSObject {
     
     
     
-    
+    static func openMapForPlace(tlatitude:Double, tlongitude:Double, pName:String, a1:String, city:String, state:String, zip:String) {
+
+        let latitude: CLLocationDegrees = tlatitude
+        let longitude: CLLocationDegrees = tlongitude
+
+        let regionDistance:CLLocationDistance = 10000
+        let coordinates = CLLocationCoordinate2DMake(latitude, longitude)
+        let regionSpan = MKCoordinateRegion(center: coordinates, latitudinalMeters: regionDistance, longitudinalMeters: regionDistance)
+        let options = [
+            MKLaunchOptionsMapCenterKey: NSValue(mkCoordinate: regionSpan.center),
+            MKLaunchOptionsMapSpanKey: NSValue(mkCoordinateSpan: regionSpan.span)
+        ]
+        
+        let address = [CNPostalAddressStreetKey: a1,
+        CNPostalAddressCityKey: city,
+        CNPostalAddressStateKey: state,
+        CNPostalAddressPostalCodeKey: zip]
+        
+        let placemark = MKPlacemark(coordinate: coordinates, addressDictionary: address)
+        
+        let mapItem = MKMapItem(placemark: placemark)
+        mapItem.name = pName
+        mapItem.openInMaps(launchOptions: options)
+    }
     
     static func req(_ term: String, _ latitude: Double, _ longitude: Double, _ radius: Double, _ price: String, completion: @escaping (_ result: [String: Any]) -> Void) {
         //Sends authorization header with API Key
@@ -63,6 +87,7 @@ class APIReq: NSObject {
             //debugPrint(closureResponse)
             switch response?.result {
                 case .success(let JSON):
+                    //let rValue = JSON as! [String: Any]
                     let value = JSON as! NSDictionary
                     let places = value["businesses"] as! Array<Any>
                     guard let randomPlace = places.randomElement() else{
@@ -70,8 +95,7 @@ class APIReq: NSObject {
                         return
                     }
                     let random = randomPlace as! NSDictionary
-                    let randomName = random.value(forKey: "name")
-                    print(randomName!)
+                    completion(random as! [String : Any])
                 case .failure(let error ):
                     print(error)
 
@@ -86,6 +110,8 @@ class APIReq: NSObject {
     static func getResult(term:String, latitude:Double, longitude:Double, radius:Double, price:String, completionHandler: @escaping (_ result: [String: Any]) -> Void) {
         req(term, latitude, longitude, radius, price, completion: completionHandler)
     }
+    
+    
 }
         
     

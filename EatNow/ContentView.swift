@@ -8,6 +8,7 @@
 
 import SwiftUI
 import PartialSheet
+import UIKit
 
 
 struct ContentView: View {
@@ -19,12 +20,26 @@ struct ContentView: View {
     @State var location: String = ""
     @State private var radius: Double = 0
     @State private var showPopover: Bool = false
+    @State private var showFilterPopover: Bool = false
     @State private var modalPresented: Bool = false
     @State private var longer: Bool = false
     @State private var P1 = false
     @State private var P2 = false
     @State private var P3 = false
     @State private var P4 = false
+    @State private var searchAlert = false
+    @State private var eateryName = ""
+    @State private var eateryLatitude: Double = 0.0
+    @State private var eateryLongitude: Double = 0.0
+    @State private var eateryNumber:URL!
+    @State private var eateryImage = ""
+    @State private var eateryYPURL:URL!
+    @State private var eateryAddress1 = ""
+    @State private var eateryAddress2 = ""
+    @State private var eateryAddress3 = ""
+    @State private var eateryCity = ""
+    @State private var eateryState = ""
+    @State private var eateryZip = ""
     
     init() {
         locationProvider = LocationProvider()
@@ -33,6 +48,7 @@ struct ContentView: View {
             print("No location access.")
             locationProvider.requestAuthorization()
         }
+        
     }
     
     var body: some View {
@@ -40,11 +56,7 @@ struct ContentView: View {
         NavigationView {
             
             VStack {
-                Text("""
-               Some information text! Here about the whole app and what it does.
-               """)
-                
-                
+                Text("Info here")
                 HStack {
                     VStack {
                         TextField("What do you feel like eating?", text: $term)
@@ -80,38 +92,89 @@ struct ContentView: View {
                             }
                             APIReq.getResult(term: self.term, latitude: (self.locationProvider.location?.coordinate.latitude)!,
                                              longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius, price: priceString) { result in
-                                print(result.keys)
+                                //print(result.keys)
                                 let JSON = result
-                                if let total = JSON["total"] as? NSNumber {
-                                    print(total)
+                                print(JSON)
+                                if let imageUrl = JSON["image_url"]{
+                                    self.eateryImage = imageUrl as! String
                                 }
-                                if let region = JSON["region"] as? NSDictionary {
-                                    print(region)
+                                if let businessName = JSON["name"]{
+                                    self.eateryName = businessName as! String
                                 }
-                                if let businesses = JSON["businesses"] as? NSArray {
-                                    print(businesses)
+                                if let coordinates = JSON["coordinates"] as? NSDictionary {
+                                    self.eateryLatitude = coordinates["latitude"] as! Double
+                                    self.eateryLongitude = coordinates["longitude"] as! Double
                                 }
-                                
-                                //let coords = JSON["coordinates"] as! NSDictionary
-                                //let latitude = coords["latitude"]!
-                                //let longitude = coords["longitude"]!
-                                //print(coords)
-                                //print(latitude)
-                                //print(longitude)
+                                if let locate = JSON["location"] as? NSDictionary {
+                                    self.eateryAddress1 = locate["address1"] as! String
+                                    self.eateryCity = locate["city"] as! String
+                                    self.eateryState = locate["state"] as! String
+                                    self.eateryZip = locate["zip_code"] as! String
+                                }
+                                if let phoneNumber = JSON["phone"]{
+                                    let pn = phoneNumber as! String
+                                    let trimmedNumber = pn.replacingOccurrences(of: "+", with: "")
+                                    let tel = "tel://"
+                                    let formattedString = tel + trimmedNumber
+                                    let url: URL = URL(string: formattedString)!
+                                    self.eateryNumber = url
+                                }
+                                if let ypURL = JSON["url"]{
+                                    let yp = ypURL as! String
+                                    let url: URL = URL(string: yp)!
+                                    self.eateryYPURL = url
+                                }
+                                if(self.eateryName == ""){
+                                    self.searchAlert.toggle()
+                                }
+                                else{
+                                    self.showPopover = true
+                                }
                             }
-                            
-                            
+                        }
+                        .alert(isPresented: $searchAlert) {
+                            Alert(title: Text("There were 5 total results"))
                         }
                         .accentColor(.white)
                         .padding()
                         .background(Color.gray)
+                        .popover(isPresented: self.$showPopover, arrowEdge: .bottom) {
+                            NavigationView {
+                                VStack{
+                                    ImageView(withURL: self.eateryImage)
+                                    Text(self.eateryName)
+                                    Button(action: {
+                                        APIReq.openMapForPlace(tlatitude: self.eateryLatitude, tlongitude: self.eateryLongitude, pName: self.eateryName, a1: self.eateryAddress1, city: self.eateryCity, state: self.eateryState, zip: self.eateryZip)
+                                    }){
+                                        Text("Directions")
+                                    }
+                                    Button(action: {
+                                        UIApplication.shared.open(self.eateryYPURL)
+                                    }){
+                                        Text("Go to Yelp")
+                                    }
+                                }
+                                .navigationBarTitle(Text("Result"), displayMode: .inline)
+                                .navigationBarItems(leading:
+                                    Button(action: {
+                                        self.showPopover = false
+                                    }) {
+                                        Group {
+                                            Text("New Search")
+                                        }.background(Color.white)
+                                    },
+                                                    trailing:
+                                    Button(action: {
+                                        UIApplication.shared.open(self.eateryNumber)
+                                    }) {
+                                        Group {
+                                            Text("Call")
+                                        } .background(Color.white)
+                                    }
+                                )
+                            }
+                        }
                     }
-                }
-                if((Int(radius)) == 0){
-                    Text("Search radius: None")
-                }
-                else{
-                   Text("Search radius: \(Int(radius))")
                 }
                 HStack{
                     Button(action: {self.P1.toggle()}) {
@@ -139,26 +202,32 @@ struct ContentView: View {
                         .background(RoundedRectangle(cornerRadius: 5.0)
                                     .fill(self.P4 ? Color.green : Color.blue))
                 }
-                
+                if((Int(radius)) == 0){
+                    Text("Search radius: None")
+                }
+                else{
+                   Text("Search radius: \(Int(radius))")
+                }
+                //Consider adding buttons for search radius 1/5/10/25
                 Slider(value: self.$radius, in: 0...25, step: 1)
                 Spacer()
                 HStack {
                     
                     Button("Filters") {
-                        self.showPopover = true
+                        self.showFilterPopover = true
                     }
                         
                         
                     .accentColor(.white)
                     .padding()
                     .background(Color.gray)
-                    .popover(isPresented: self.$showPopover, arrowEdge: .bottom) {
+                    .popover(isPresented: self.$showFilterPopover, arrowEdge: .bottom) {
                         NavigationView {
                             Text("Names")
                                 .navigationBarTitle(Text("Filters"), displayMode: .inline)
                                 .navigationBarItems(leading:
                                     Button(action: {
-                                        self.showPopover = false
+                                        self.showFilterPopover = false
                                     }) {
                                         Group {
                                             Text("Cancel")

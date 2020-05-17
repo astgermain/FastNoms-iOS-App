@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var modalPresented: Bool = false
     @State private var longer: Bool = false
     
+    
     var body: some View {
         
         NavigationView {
@@ -35,7 +36,8 @@ struct ContentView: View {
                     TextField("Location", text: $location)
                         .border(Color.black)
                     Button("Test"){
-                        APIReq.getResult(term: self.term, location: self.location) { result in
+                    
+                        APIReq.getResult(term: self.term, location: self.location, radius: self.radius) { result in
                             print(result.keys)
                             let JSON = result
                             if let total = JSON["total"] as? NSNumber {
@@ -62,8 +64,14 @@ struct ContentView: View {
                     .padding()
                     .background(Color.gray)
                 }
-                Text("Distance away: \(Int(radius))")
-                Slider(value: self.$radius, in: 0...100, step: 1)
+                if((Int(radius)) == 0){
+                    Text("Search radius: None")
+                }
+                else{
+                   Text("Search radius: \(Int(radius))")
+                }
+                
+                Slider(value: self.$radius, in: 0...25, step: 1)
                 Spacer()
                 HStack {
                     

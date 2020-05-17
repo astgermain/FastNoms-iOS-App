@@ -11,6 +11,7 @@ import PartialSheet
 
 struct ContentView: View {
     var sortType = ["Recommended", "Rating", "Distance", "Most Reviewed"]
+    @ObservedObject var locationProvider : LocationProvider
     
     @State private var selectedSort = 0
     @State var term: String = ""
@@ -20,6 +21,14 @@ struct ContentView: View {
     @State private var modalPresented: Bool = false
     @State private var longer: Bool = false
     
+    init() {
+        locationProvider = LocationProvider()
+        do {try locationProvider.start()}
+        catch {
+            print("No location access.")
+            locationProvider.requestAuthorization()
+        }
+    }
     
     var body: some View {
         
@@ -29,6 +38,10 @@ struct ContentView: View {
                 Text("""
                Some information text! Here about the whole app and what it does.
                """)
+                VStack{
+                Text("latitude \(locationProvider.location?.coordinate.latitude ?? 0)")
+                Text("longitude \(locationProvider.location?.coordinate.longitude ?? 0)")
+                }
                 
                 HStack {
                     TextField("Search", text: $term)

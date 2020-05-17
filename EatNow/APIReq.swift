@@ -8,9 +8,12 @@
 
 import Alamofire
 import Foundation
-
+import MapKit
+import CoreLocation
 
 class APIReq: NSObject {
+    
+    
     
     
     

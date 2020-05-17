@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		49870A9124716E2E007D431F /* LocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49870A9024716E2E007D431F /* LocationProvider.swift */; };
 		49DABD4023DB13EC007072E9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DABD3F23DB13EC007072E9 /* AppDelegate.swift */; };
 		49DABD4223DB13EC007072E9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DABD4123DB13EC007072E9 /* SceneDelegate.swift */; };
 		49DABD4423DB13EC007072E9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DABD4323DB13EC007072E9 /* ContentView.swift */; };
@@ -43,6 +44,7 @@
 /* Begin PBXFileReference section */
 		1FDCD32D9EF978526A9D7CE2 /* Pods-EatNowTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EatNowTests.release.xcconfig"; path = "Target Support Files/Pods-EatNowTests/Pods-EatNowTests.release.xcconfig"; sourceTree = "<group>"; };
 		2BBB77870E14CB8A9B0997B3 /* Pods-EatNow-EatNowUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EatNow-EatNowUITests.debug.xcconfig"; path = "Target Support Files/Pods-EatNow-EatNowUITests/Pods-EatNow-EatNowUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		49870A9024716E2E007D431F /* LocationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationProvider.swift; sourceTree = "<group>"; };
 		49DABD3C23DB13EC007072E9 /* EatNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EatNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49DABD3F23DB13EC007072E9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49DABD4123DB13EC007072E9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -126,6 +128,7 @@
 			children = (
 				49DABD7723DB8F6C007072E9 /* EatNow.entitlements */,
 				49DABD3F23DB13EC007072E9 /* AppDelegate.swift */,
+				49870A9024716E2E007D431F /* LocationProvider.swift */,
 				49DABD7123DB1C33007072E9 /* APIReq.swift */,
 				49DABD4123DB13EC007072E9 /* SceneDelegate.swift */,
 				49DABD4323DB13EC007072E9 /* ContentView.swift */,
@@ -436,6 +439,7 @@
 				49DABD7223DB1C33007072E9 /* APIReq.swift in Sources */,
 				49DABD4223DB13EC007072E9 /* SceneDelegate.swift in Sources */,
 				49DABD4423DB13EC007072E9 /* ContentView.swift in Sources */,
+				49870A9124716E2E007D431F /* LocationProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

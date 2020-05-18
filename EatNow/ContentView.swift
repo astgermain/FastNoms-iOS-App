@@ -178,47 +178,80 @@ struct ContentView: View {
                     }
                 }
                 
-                HStack{
+                VStack(alignment: .trailing, spacing: 20){
                     GeometryReader { geometry in
+                        Text("")
+                            Button(action: {}) {
+                                Text("")
+                                    .foregroundColor(self.P1 ? .white : .black)
+                                    .frame(width: geometry.size.width, height: 50)
+                            }
+                                .accentColor(.black)
+                                .background(RoundedRectangle(cornerRadius: 25)
+                                .fill(Color.black))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 25)
+                                        .stroke(Color.black, lineWidth: 2)
+                                )
+                        
+                            Button(action: {self.P1.toggle()}) {
+                                Text("$")
+                                    .foregroundColor(self.P1 ? .white : .black)
+                                    .frame(width: geometry.size.width/4 - 1, height: 50)
+                            }
+                                .accentColor(.black)
+                                .background(RoundedRectangle(cornerRadius: 0.0)
+                                .fill(self.P1 ? Color.blue : Color.white))
+                                .cornerRadius(radius: 25, corners: [.topLeft, .bottomLeft])
+                        
+                            Button(action: {self.P2.toggle()}) {
+                                Text("$$")
+                                    .foregroundColor(self.P2 ? .white : .black)
+                                    .frame(width: geometry.size.width/4 - 1, height: 50)
+                            }
+                                .accentColor(.black)
+                                .background(RoundedRectangle(cornerRadius: 0.0)
+                                .fill(self.P2 ? Color.blue : Color.white))
+                                .padding(.horizontal, geometry.size.width/4)
+                        
+                            Button(action: {self.P3.toggle()}) {
+                                Text("$$$")
+                                    .foregroundColor(self.P3 ? .white : .black)
+                                    .frame(width: geometry.size.width/4 - 1, height: 50)
+                            }
+                                .accentColor(.black)
+                                .background(RoundedRectangle(cornerRadius: 0.0)
+                                .fill(self.P3 ? Color.blue : Color.white))
+                    
+                                .padding(.horizontal, geometry.size.width/2)
+                        
+                            Button(action: {self.P4.toggle()}) {
+                                Text("$$$$")
+                                    .foregroundColor(self.P4 ? .white : .black)
+                                    .frame(width: geometry.size.width/4, height: 50)
+                                
+                            }
+                                .accentColor(.black)
+                                .background(RoundedRectangle(cornerRadius: 0.0)
+                                .fill(self.P4 ? Color.blue : Color.white))
+                                .cornerRadius(radius: 25, corners: [.topRight, .bottomRight])
+                                .padding(.horizontal, geometry.size.width/4 + geometry.size.width/2)
                         HStack{
-                        Button(action: {self.P1.toggle()}) {
-                            Text("$")
-                                .foregroundColor(self.P1 ? .white : .black)
+                            Divider()
+                                .frame(width: 3, height: 50)
+                                .padding(.horizontal, geometry.size.width/4 - 2)
                         }
-                            .accentColor(.black)
-                            .padding(10)
-                            .frame(width: geometry.size.width/4, height: 50)
-                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
-                            .background(RoundedRectangle(cornerRadius: 5.0)
-                            .fill(self.P1 ? Color.blue : Color.white))
-                        Button(action: {self.P2.toggle()}) {
-                            Text("$$")
-                                .foregroundColor(self.P2 ? .white : .black)
-                        }   .accentColor(.black)
-                            .padding(10)
-                            .frame(width: geometry.size.width/4, height: 50)
-                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
-                            .background(RoundedRectangle(cornerRadius: 5.0)
-                            .fill(self.P2 ? Color.blue : Color.white))
-                        Button(action: {self.P3.toggle()}) {
-                            Text("$$$")
-                                .foregroundColor(self.P3 ? .white : .black)
-                        }   .accentColor(.black)
-                            .padding(10)
-                            .frame(width: geometry.size.width/4, height: 50)
-                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
-                            .background(RoundedRectangle(cornerRadius: 5.0)
-                            .fill(self.P3 ? Color.blue : Color.white))
-                        Button(action: {self.P4.toggle()}) {
-                            Text("$$$$")
-                                .foregroundColor(self.P4 ? .white : .black)
-                        }   .accentColor(.black)
-                            .padding(10)
-                            .frame(width: geometry.size.width/4, height: 50)
-                            .overlay(RoundedRectangle(cornerRadius: 5).stroke(Color.gray, lineWidth: 1))
-                            .background(RoundedRectangle(cornerRadius: 5.0)
-                            .fill(self.P4 ? Color.blue : Color.white))
+                        HStack{
+                            Divider()
+                                .frame(width: 3, height: 50)
+                                .padding(.horizontal, geometry.size.width/4 + geometry.size.width/2 - 2)
                         }
+                        HStack{
+                            Divider()
+                                .frame(width: 3,height: 50)
+                                .padding(.horizontal, geometry.size.width/2 - 2)
+                        }
+                        
                     }
                 }
                 if((Int(radius)) == 0){
@@ -320,3 +353,42 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
     }
 }
+
+struct CornerRadiusStyle: ViewModifier {
+    var radius: CGFloat
+    var corners: UIRectCorner
+
+    struct CornerRadiusShape: Shape {
+
+        var radius = CGFloat.infinity
+        var corners = UIRectCorner.allCorners
+        let sl = CAShapeLayer()
+        
+        func path(in rect: CGRect) -> Path {
+            
+            let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+                        
+            return Path(path.cgPath)
+        }
+    }
+
+    func body(content: Content) -> some View {
+        content
+            .clipShape(CornerRadiusShape(radius: radius, corners: corners))
+            
+            
+            
+    }
+}
+
+extension View {
+    func cornerRadius(radius: CGFloat, corners: UIRectCorner) -> some View {
+        ModifiedContent(content: self, modifier: CornerRadiusStyle(radius: radius, corners: corners))
+    }
+    
+    public func addBorder<S>(_ content: S, width: CGFloat = 1, cornerRadius: CGFloat) -> some View where S : ShapeStyle {
+        
+        return overlay(RoundedRectangle(cornerRadius: cornerRadius).strokeBorder(content, lineWidth: width))
+    }
+}
+

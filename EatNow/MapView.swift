@@ -63,6 +63,7 @@ struct MapView: UIViewRepresentable {
         }
         view.setRegion(region, animated: true)
         
+        
         view.showsUserLocation = true
         
     }

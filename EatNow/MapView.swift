@@ -18,6 +18,7 @@ struct MapView: UIViewRepresentable {
     var annotations: [MKPointAnnotation]
     
     @State private var locationProvider = LocationProvider()
+    @State private var oneTime: Bool = false
     
     func makeUIView(context: Context) -> MKMapView {
         
@@ -30,6 +31,16 @@ struct MapView: UIViewRepresentable {
             //print("No location access.")
             locationProvider.requestAuthorization()
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {
+        let span = MKCoordinateSpan(latitudeDelta: 0.09, longitudeDelta: 0.09)
+        let region = MKCoordinateRegion(center: mapView.userLocation.coordinate, span: span)
+        mapView.setRegion(region, animated: true)
+            if(self.centerCoordinate.latitude != mapView.userLocation.coordinate.latitude && self.centerCoordinate.longitude != mapView.userLocation.coordinate.longitude && self.oneTime != true){
+            self.centerCoordinate = mapView.userLocation.coordinate
+            self.oneTime = true
+        }
+        
+        })
         
         //print(self.locationProvider.authorizationStatus?.name)
         return mapView
@@ -44,13 +55,14 @@ struct MapView: UIViewRepresentable {
         annotation.coordinate = CLLocationCoordinate2D(latitude: 37.5, longitude: -118.13)
         view.addAnnotation(annotation)
          */
-        
         let span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         let region = MKCoordinateRegion(center: centerCoordinate, span: span)
         view.removeAnnotations(annotations)
-        view.addAnnotation(annotations[annotations.endIndex - 1])
+        if(annotations.capacity > 0){
+            view.addAnnotation(annotations[annotations.endIndex - 1])
+        }
         view.setRegion(region, animated: true)
-       
+        
         view.showsUserLocation = true
         
     }

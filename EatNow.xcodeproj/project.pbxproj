@@ -107,17 +107,9 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		49633111247F0489005B0FEA /* Screenshots */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Screenshots;
-			sourceTree = "<group>";
-		};
 		49DABD3323DB13EC007072E9 = {
 			isa = PBXGroup;
 			children = (
-				49633111247F0489005B0FEA /* Screenshots */,
 				49DABD3E23DB13EC007072E9 /* EatNow */,
 				49DABD5523DB13EE007072E9 /* EatNowTests */,
 				49DABD6023DB13EE007072E9 /* EatNowUITests */,

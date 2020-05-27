@@ -84,7 +84,7 @@ public class LocationProvider: NSObject, ObservableObject {
         else {
             /// no authorization set by delegate yet
             #if DEBUG
-            print(#function, "No location authorization status set by delegate yet. Try to start updates anyhow.")
+            //print(#function, "No location authorization status set by delegate yet. Try to start updates anyhow.")
             #endif
             /// In principle, this should throw an error.
             /// However, this would prevent start() from running directly after the LocationProvider is initialized.
@@ -127,7 +127,7 @@ extension LocationProvider: CLLocationManagerDelegate {
     public func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         self.authorizationStatus = status
         #if DEBUG
-        print(#function, status.name)
+        //print(#function, status.name)
         #endif
         //print()
     }

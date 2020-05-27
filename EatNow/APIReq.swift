@@ -71,6 +71,7 @@ class APIReq: NSObject {
         if(price != ""){
             ifPrice = "&price=\(price)"
         }
+        let categories = "food"
         
         struct Businesses: Codable {
             var coordinates: [Coordinates]
@@ -82,7 +83,7 @@ class APIReq: NSObject {
         }
         
         
-        AF.request("\(apiUrl)businesses/search?term=\(trimmedTerm)&latitude=\(latitude)&longitude=\(longitude)&radius=\(parsedRadius)&open_now=true\(ifPrice)", headers: headers).validate().responseJSON { closureResponse in
+        AF.request("\(apiUrl)businesses/search?term=\(trimmedTerm)&latitude=\(latitude)&longitude=\(longitude)&radius=\(parsedRadius)&categories=\(categories)&open_now=true\(ifPrice)", headers: headers).validate().responseJSON { closureResponse in
             response = closureResponse
             //debugPrint(closureResponse)
             switch response?.result {

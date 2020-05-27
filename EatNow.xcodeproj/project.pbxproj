@@ -21,6 +21,7 @@
 		49DABD7223DB1C33007072E9 /* APIReq.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DABD7123DB1C33007072E9 /* APIReq.swift */; };
 		49DABD7523DB8EA5007072E9 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49DABD7423DB8EA5007072E9 /* CloudKit.framework */; };
 		49DABD7B23E26804007072E9 /* PartialSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 49DABD7A23E26804007072E9 /* PartialSheet */; };
+		49DEB23D247DBC57009404B5 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DEB23C247DBC57009404B5 /* MapView.swift */; };
 		6CEB409E2066AF159D5D3BDA /* Pods_EatNowTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A6CD42293F0C16C1804CE1AE /* Pods_EatNowTests.framework */; };
 		BD9E771D5E86E528CA248959 /* Pods_EatNow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52F5FEDB4132D3C1327E0BF1 /* Pods_EatNow.framework */; };
 		F593C0227246AF096D557B8F /* Pods_EatNow_EatNowUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C62CE12C10E1F1FD813B937A /* Pods_EatNow_EatNowUITests.framework */; };
@@ -66,6 +67,7 @@
 		49DABD7123DB1C33007072E9 /* APIReq.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIReq.swift; sourceTree = "<group>"; };
 		49DABD7423DB8EA5007072E9 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		49DABD7623DB8F6C007072E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Base; path = Base.lproj/EatNow.entitlements; sourceTree = "<group>"; };
+		49DEB23C247DBC57009404B5 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		52F5FEDB4132D3C1327E0BF1 /* Pods_EatNow.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EatNow.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4F5AAD640CA8E6F6CC13646 /* Pods-EatNow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EatNow.release.xcconfig"; path = "Target Support Files/Pods-EatNow/Pods-EatNow.release.xcconfig"; sourceTree = "<group>"; };
 		A6CD42293F0C16C1804CE1AE /* Pods_EatNowTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_EatNowTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -138,6 +140,7 @@
 				4912DDCC2471AFFA0028851C /* ImageLoader.swift */,
 				49DABD4123DB13EC007072E9 /* SceneDelegate.swift */,
 				49DABD4323DB13EC007072E9 /* ContentView.swift */,
+				49DEB23C247DBC57009404B5 /* MapView.swift */,
 				49DABD4523DB13EE007072E9 /* Assets.xcassets */,
 				49DABD4A23DB13EE007072E9 /* LaunchScreen.storyboard */,
 				49DABD4D23DB13EE007072E9 /* Info.plist */,
@@ -442,6 +445,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4912DDCD2471AFFA0028851C /* ImageLoader.swift in Sources */,
+				49DEB23D247DBC57009404B5 /* MapView.swift in Sources */,
 				49DABD4023DB13EC007072E9 /* AppDelegate.swift in Sources */,
 				49DABD7223DB1C33007072E9 /* APIReq.swift in Sources */,
 				49DABD4223DB13EC007072E9 /* SceneDelegate.swift in Sources */,
@@ -621,7 +625,7 @@
 			baseConfigurationReference = DDCE1FF41841997F38F02471 /* Pods-EatNow.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = EatNow/EatNow.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"EatNow/Preview Content\"";
@@ -645,7 +649,7 @@
 			baseConfigurationReference = A4F5AAD640CA8E6F6CC13646 /* Pods-EatNow.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = EatNow/EatNow.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"EatNow/Preview Content\"";

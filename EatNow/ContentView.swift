@@ -9,6 +9,7 @@
 import SwiftUI
 import PartialSheet
 import UIKit
+import MapKit
 
 
 struct ContentView: View {
@@ -40,6 +41,10 @@ struct ContentView: View {
     @State private var eateryCity = ""
     @State private var eateryState = ""
     @State private var eateryZip = ""
+    @State private var centerCoordinate = CLLocationCoordinate2D()
+    @State private var eateryCoordinate = CLLocationCoordinate2D()
+    @State private var locations = [MKPointAnnotation]()
+    @State private var currentLocation = CLLocationCoordinate2D()
     
     let alert1 = Alert(title: Text("There were no results"))
     
@@ -54,11 +59,9 @@ struct ContentView: View {
     }
     
     var body: some View {
-        
         NavigationView {
             
             VStack {
-                Text("")
                 HStack {
                     VStack {
                         HStack{
@@ -92,11 +95,12 @@ struct ContentView: View {
                                         priceString.append(",4")
                                     }
                                 }
+                                //Pass in categories to choose from food, bar, etc
                                 APIReq.getResult(term: self.term, latitude: (self.locationProvider.location?.coordinate.latitude)!,
                                                  longitude: (self.locationProvider.location?.coordinate.longitude)!, radius: self.radius, price: priceString) { result in
                                     //print(result.keys)
                                     let JSON = result
-                                    //print(JSON)
+                                    print(JSON)
                                     if let imageUrl = JSON["image_url"]{
                                         self.eateryImage = imageUrl as! String
                                     }
@@ -108,14 +112,28 @@ struct ContentView: View {
                                         self.searchAlert = true
                                     }
                                     if let coordinates = JSON["coordinates"] as? NSDictionary {
+                                        
                                         self.eateryLatitude = coordinates["latitude"] as! Double
                                         self.eateryLongitude = coordinates["longitude"] as! Double
+                                        self.eateryCoordinate = CLLocationCoordinate2D(latitude: self.eateryLatitude, longitude: self.eateryLongitude)
+                                        let newLocation = MKPointAnnotation()
+                                        newLocation.coordinate = self.eateryCoordinate
+                                        self.locations.append(newLocation)
                                     }
+                                                     
                                     if let locate = JSON["location"] as? NSDictionary {
-                                        self.eateryAddress1 = locate["address1"] as! String
-                                        self.eateryCity = locate["city"] as! String
-                                        self.eateryState = locate["state"] as! String
-                                        self.eateryZip = locate["zip_code"] as! String
+                                        if let a1 = locate["address1"]as? String {
+                                            self.eateryAddress1 = a1
+                                        }
+                                        if let c = locate["city"] as? String {
+                                            self.eateryCity = c
+                                        }
+                                        if let s = locate["state"] as? String {
+                                            self.eateryState = s
+                                        }
+                                        if let z = locate["zip_code"] as? String {
+                                            self.eateryZip = z
+                                        }
                                     }
                                     if let phoneNumber = JSON["phone"]{
                                         let pn = phoneNumber as! String
@@ -134,25 +152,72 @@ struct ContentView: View {
                             }
                                 
                         }
+                        .keyboardType(.webSearch)
                         .padding(10)
-                        .font(Font.system(size: 15, weight: .medium, design: .serif))
+                        .font(Font.system(size: 15, weight: .medium, design: .rounded))
                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.gray, lineWidth: 1))
                         .popover(isPresented: self.$showPopover, arrowEdge: .bottom) {
                             NavigationView {
-                                VStack{
-                                    ImageView(withURL: self.eateryImage)
-                                    Text(self.eateryName)
-                                    Button(action: {
-                                        APIReq.openMapForPlace(tlatitude: self.eateryLatitude, tlongitude: self.eateryLongitude, pName: self.eateryName, a1: self.eateryAddress1, city: self.eateryCity, state: self.eateryState, zip: self.eateryZip)
-                                    }){
-                                        Text("Directions")
+                                VStack(alignment: .center) {
+                                    MapView(centerCoordinate: self.$eateryCoordinate, annotations: self.locations)
+                                        .edgesIgnoringSafeArea(.all)
+                                    
+                                    HStack {
+                                        Text(self.eateryName)
+                                            .font(Font.system(size: 32, weight: .heavy))
                                     }
-                                    Button(action: {
-                                        UIApplication.shared.open(self.eateryYPURL)
-                                    }){
-                                        Text("Go to Yelp")
+                                    .padding()
+                                    HStack {
+                                        Text(self.eateryAddress1)
+                                            .font(Font.system(size: 16, weight: .light))
+                                            .foregroundColor(.black)
                                     }
+                                    
+                                    HStack {
+                                        Text(self.eateryCity)
+                                            .font(Font.system(size: 16, weight: .light))
+                                            .foregroundColor(.black)
+                                        Text(self.eateryState)
+                                            .font(Font.system(size: 16, weight: .light))
+                                            .foregroundColor(.black)
+                                        Text(self.eateryZip)
+                                            .font(Font.system(size: 16, weight: .light))
+                                            .foregroundColor(.black)
+                                    }
+                    
+                                    HStack {
+                                        Button(action: {
+                                            APIReq.openMapForPlace(tlatitude: self.eateryLatitude, tlongitude: self.eateryLongitude, pName: self.eateryName, a1: self.eateryAddress1, city: self.eateryCity, state: self.eateryState, zip: self.eateryZip)
+                                        }){
+                                            Text("Directions")
+                                                .padding()
+                                                .foregroundColor(.white)
+                                                .frame(maxWidth: .infinity)
+                                        }
+                                            .accentColor(.blue)
+                                            .background(RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color.blue))
+                                    }
+                                    .padding()
+                                    HStack {
+                                        Button(action: {
+                                            UIApplication.shared.open(self.eateryYPURL)
+                                        }){
+                                            Text("Go to Yelp")
+                                                .padding()
+                                                .foregroundColor(.white)
+                                                .frame(maxWidth: .infinity)
+                                        }
+                                            .accentColor(.blue)
+                                            .background(RoundedRectangle(cornerRadius: 10)
+                                            .fill(Color.blue))
+                                    }
+                                    .padding()
+                                    
+                                    
+                                    
                                 }
+                                
                                 .navigationBarTitle(Text("Result"), displayMode: .inline)
                                 .navigationBarItems(leading:
                                     Button(action: {
@@ -172,143 +237,140 @@ struct ContentView: View {
                                     }
                                 )
                             }
+                        } //End search bar
+                        VStack(alignment: .leading) {
+                            if((Int(radius)) == 0){
+                               Text("Search radius: None")
+                            }
+                            else{
+                               Text("Search radius: \(Int(radius)) miles")
+                            
+                            }
+                            //Consider adding buttons for search radius 1/5/10/25
+                            Slider(value: self.$radius, in: 0...25, step: 1)
                         }
+                        
+                        HStack {
+                            GeometryReader { geometry in
+                                Button(action: {self.showFilterPopover = true}) {
+                                    Text("Filters")
+                                        .padding()
+                                        .frame(width: geometry.size.width/2 - 25, height: 40)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(Color.gray, lineWidth: 2)
+                                        )
+                                }
+                                .padding(.horizontal, 12.5)
+                                .padding(.vertical, 50)
+                                .accentColor(.black)
+                                .popover(isPresented: self.$showFilterPopover, arrowEdge: .bottom) {
+                                    NavigationView {
+                                        Text("Names")
+                                            .navigationBarTitle(Text("Filters"), displayMode: .inline)
+                                            .navigationBarItems(
+                                                leading: Button(action: {
+                                                    self.showFilterPopover = false
+                                                }) {
+                                                    Group {
+                                                        Text("Cancel")
+                                                    }.background(Color.white)
+                                                },
+                                                trailing: Button(action: {
+                                                    print("tapped")
+                                                }) {
+                                                    Group {
+                                                        Text("Reset")
+                                                    } .background(Color.white)
+                                                })
+                                    }
+                                }
+                                Button(action: {self.modalPresented = true}, label: {
+                                    Text("Sort")
+                                        .padding()
+                                        .frame(width: geometry.size.width/2 - 25, height: 40)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(Color.gray, lineWidth: 2)
+                                        )
+                                })
+                                    .padding(.horizontal, geometry.size.width/2 + 12.5)
+                                    .padding(.vertical, 50)
+                                    .accentColor(.black)
+                                
+                            
+                                Button(action: {}) {
+                                            Text("")
+                                                .foregroundColor(self.P1 ? .white : .gray)
+                                                .frame(width: geometry.size.width, height: 35)
+                                        }
+                                            .accentColor(.gray)
+                                            .background(RoundedRectangle(cornerRadius: 25)
+                                            .fill(Color.gray))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 25)
+                                                    .stroke(Color.gray, lineWidth: 2)
+                                            )
+                                    
+                                        Button(action: {self.P1.toggle()}) {
+                                            Text("$")
+                                                .foregroundColor(self.P1 ? .white : .black)
+                                                .frame(width: geometry.size.width/4 - 1, height: 35)
+                                                .font(Font.system(size: 12, design: .monospaced))
+                                        }
+                                            .accentColor(.gray)
+                                            .background(RoundedRectangle(cornerRadius: 0.0)
+                                            .fill(self.P1 ? Color.blue : Color.white))
+                                            .cornerRadius(radius: 25, corners: [.topLeft, .bottomLeft])
+                                    
+                                        Button(action: {self.P2.toggle()}) {
+                                            Text("$$")
+                                                .foregroundColor(self.P2 ? .white : .black)
+                                                .frame(width: geometry.size.width/4 - 1, height: 35)
+                                                .font(Font.system(size: 12, design: .monospaced))
+                                        }
+                                            .accentColor(.gray)
+                                            .background(RoundedRectangle(cornerRadius: 0.0)
+                                            .fill(self.P2 ? Color.blue : Color.white))
+                                            .padding(.horizontal, geometry.size.width/4)
+                                    
+                                        Button(action: {self.P3.toggle()}) {
+                                            Text("$$$")
+                                                .foregroundColor(self.P3 ? .white : .black)
+                                                .frame(width: geometry.size.width/4 - 1, height: 35)
+                                                .font(Font.system(size: 12, design: .monospaced))
+                                        }
+                                            .accentColor(.gray)
+                                            .background(RoundedRectangle(cornerRadius: 0.0)
+                                            .fill(self.P3 ? Color.blue : Color.white))
+                                
+                                            .padding(.horizontal, geometry.size.width/2)
+                                    
+                                        Button(action: {self.P4.toggle()}) {
+                                            Text("$$$$")
+                                                .foregroundColor(self.P4 ? .white : .black)
+                                                .frame(width: geometry.size.width/4, height: 35)
+                                                .font(Font.system(size: 12, design: .monospaced))
+                                            
+                                        }
+                                            .accentColor(.gray)
+                                            .background(RoundedRectangle(cornerRadius: 0.0)
+                                            .fill(self.P4 ? Color.blue : Color.white))
+                                            .cornerRadius(radius: 25, corners: [.topRight, .bottomRight])
+                                            .padding(.horizontal, geometry.size.width/4 + geometry.size.width/2)
+                                
+                            }
+                            
+                            
+                        }// end filter/sort hstack
+                        
+                        
                     }.alert(isPresented: self.$searchAlert) {
                         self.alert1
                     }
                 }
+   
                 
-                VStack(alignment: .trailing, spacing: 20){
-                    GeometryReader { geometry in
-                        Text("")
-                            Button(action: {}) {
-                                Text("")
-                                    .foregroundColor(self.P1 ? .white : .black)
-                                    .frame(width: geometry.size.width, height: 50)
-                            }
-                                .accentColor(.black)
-                                .background(RoundedRectangle(cornerRadius: 25)
-                                .fill(Color.black))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 25)
-                                        .stroke(Color.black, lineWidth: 2)
-                                )
-                        
-                            Button(action: {self.P1.toggle()}) {
-                                Text("$")
-                                    .foregroundColor(self.P1 ? .white : .black)
-                                    .frame(width: geometry.size.width/4 - 1, height: 50)
-                            }
-                                .accentColor(.black)
-                                .background(RoundedRectangle(cornerRadius: 0.0)
-                                .fill(self.P1 ? Color.blue : Color.white))
-                                .cornerRadius(radius: 25, corners: [.topLeft, .bottomLeft])
-                        
-                            Button(action: {self.P2.toggle()}) {
-                                Text("$$")
-                                    .foregroundColor(self.P2 ? .white : .black)
-                                    .frame(width: geometry.size.width/4 - 1, height: 50)
-                            }
-                                .accentColor(.black)
-                                .background(RoundedRectangle(cornerRadius: 0.0)
-                                .fill(self.P2 ? Color.blue : Color.white))
-                                .padding(.horizontal, geometry.size.width/4)
-                        
-                            Button(action: {self.P3.toggle()}) {
-                                Text("$$$")
-                                    .foregroundColor(self.P3 ? .white : .black)
-                                    .frame(width: geometry.size.width/4 - 1, height: 50)
-                            }
-                                .accentColor(.black)
-                                .background(RoundedRectangle(cornerRadius: 0.0)
-                                .fill(self.P3 ? Color.blue : Color.white))
-                    
-                                .padding(.horizontal, geometry.size.width/2)
-                        
-                            Button(action: {self.P4.toggle()}) {
-                                Text("$$$$")
-                                    .foregroundColor(self.P4 ? .white : .black)
-                                    .frame(width: geometry.size.width/4, height: 50)
-                                
-                            }
-                                .accentColor(.black)
-                                .background(RoundedRectangle(cornerRadius: 0.0)
-                                .fill(self.P4 ? Color.blue : Color.white))
-                                .cornerRadius(radius: 25, corners: [.topRight, .bottomRight])
-                                .padding(.horizontal, geometry.size.width/4 + geometry.size.width/2)
-                        HStack{
-                            Divider()
-                                .frame(width: 3, height: 50)
-                                .padding(.horizontal, geometry.size.width/4 - 2)
-                        }
-                        HStack{
-                            Divider()
-                                .frame(width: 3, height: 50)
-                                .padding(.horizontal, geometry.size.width/4 + geometry.size.width/2 - 2)
-                        }
-                        HStack{
-                            Divider()
-                                .frame(width: 3,height: 50)
-                                .padding(.horizontal, geometry.size.width/2 - 2)
-                        }
-                        
-                    }
-                }
-                if((Int(radius)) == 0){
-                    Text("Search radius: None")
-                }
-                else{
-                   Text("Search radius: \(Int(radius))")
-                }
-                //Consider adding buttons for search radius 1/5/10/25
-                Slider(value: self.$radius, in: 0...25, step: 1)
-                Spacer()
-                HStack {
-                    
-                    Button("Filters") {
-                        self.showFilterPopover = true
-                    }
-                        
-                        
-                    .accentColor(.white)
-                    .padding()
-                    .background(Color.gray)
-                    .popover(isPresented: self.$showFilterPopover, arrowEdge: .bottom) {
-                        NavigationView {
-                            Text("Names")
-                                .navigationBarTitle(Text("Filters"), displayMode: .inline)
-                                .navigationBarItems(leading:
-                                    Button(action: {
-                                        self.showFilterPopover = false
-                                    }) {
-                                        Group {
-                                            Text("Cancel")
-                                        }.background(Color.white)
-                                    },
-                                                    trailing:
-                                    Button(action: {
-                                        print("tapped")
-                                    }) {
-                                        Group {
-                                            Text("Reset")
-                                        } .background(Color.white)
-                                    }
-                            )
-                            
-                            
-                        }
-                    }
-                    
-                    Button(action: {
-                        self.modalPresented = true
-                    }, label: {
-                        Text("Sort")
-                    })
-                        .padding()
-                        .accentColor(.white)
-                        .background(Color.gray)
-                    
-                }
             }
             .padding()
             .navigationBarTitle("EatNow")
@@ -380,6 +442,7 @@ struct CornerRadiusStyle: ViewModifier {
             
     }
 }
+
 
 extension View {
     func cornerRadius(radius: CGFloat, corners: UIRectCorner) -> some View {
